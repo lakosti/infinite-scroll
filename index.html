@@ -7,18 +7,22 @@
     <title>Vanilla App Template</title>
     
     <script type="module" crossorigin src="/infinite-scroll/commonHelpers.js"></script>
-    <link rel="stylesheet" href="/infinite-scroll/assets/index-c9db6b34.css">
+    <link rel="stylesheet" href="/infinite-scroll/assets/index-5df1d57f.css">
   </head>
   <body>
-    <!-- ENOENT: no such file or directory, open '/home/runner/work/infinite-scroll/infinite-scroll/src/partials/header.html' -->
+    <section class="gallery-section">
+  <div class="container">
+    <h1>InfiniteScroll</h1>
+    <form class="search-form js-search-form">
+      <input type="text" name="user-search-query" class="search-input" />
+      <button type="submit" class="search-btn">search</button>
+    </form>
+    <ul class="gallery js-gallery list"></ul>
 
-    <section>
-      <!-- Path to images as from index.html file -->
-      <!-- <img src="./img/javascript.svg" alt="" /> -->
-    </section>
+    <div class="backdrop js-backdrop is-hidden"></div>
+  </div>
+</section>
 
-    <!-- Loads the specified .html file -->
-    <!-- ENOENT: no such file or directory, open '/home/runner/work/infinite-scroll/infinite-scroll/src/partials/vite-promo.html' -->
 
     
   </body>
