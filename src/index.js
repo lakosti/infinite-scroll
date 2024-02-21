@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-// import SimpleLightbox from 'simplelightbox';
-// import 'simplelightbox/dist/simple-lightbox.min.css';
+import SimpleLightbox from 'simplelightbox';
+import 'simplelightbox/dist/simple-lightbox.min.css';
 
 import iziToast from 'izitoast';
 import 'izitoast/dist/css/iziToast.min.css';
@@ -15,9 +15,19 @@ const gallery = document.querySelector('.js-gallery');
 
 form.addEventListener('submit', onSearchClick);
 
+let searchQuery = null;
+let page = 1;
+const perPage = 12;
+
 axios.defaults.baseURL = 'https://api.unsplash.com';
 axios.defaults.headers.common['Authorization'] =
   'Client-ID LxvKVGJqiSe6NcEVZOaLXC-f2JIIWZaq_o0WrF8mwJc';
+
+const simplelightbox = new SimpleLightbox('.gallery a', {
+  captions: true,
+  captionsData: 'alt',
+  captionDelay: 250,
+});
 
 function getPhotos(query, page = 1, perPage) {
   return axios.get('/search/photos', {
@@ -29,6 +39,7 @@ function getPhotos(query, page = 1, perPage) {
     },
   });
 }
+///////////////////////SPINNER/////////////////////////
 
 const opts = {
   lines: 17, // The number of lines to draw
@@ -55,17 +66,41 @@ const spinner = new Spinner(opts);
 //активуємо спінер
 // spinner.spin(spinerContainer); // ( в дужках на чому повинен крутитися)
 
+///////////////////////SPINNER/////////////////////////
+
+/////////////////////////OBSERVER//////////////
+
+const options = {
+  root: null,
+  rootMargin: '100px',
+  threshold: 1.0,
+};
+
+const callback = function (entries, observer) {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      observer.unobserve(entry.target);
+      loadMoreData();
+    }
+  });
+};
+
+const observer = new IntersectionObserver(callback, options);
+
+////////////////////OBSERVER/////////////////////
+
 async function onSearchClick(evt) {
   evt.preventDefault();
   spinnerPlay();
   const form = evt.currentTarget;
-  const query = form.elements['user-search-query'].value.trim();
+  searchQuery = form.elements['user-search-query'].value.trim();
+  page = 1; // кожен новий запит на нові картинки починається з 1 ст
   //коли йде запит на сервер може статися помилка тому це потрібно вірно обробити
   try {
     //   const response = await getPhotos(query) --- витягли з респонсу дату і потім масив результату
     const {
-      data: { results },
-    } = await getPhotos(query);
+      data: { results, total_pages },
+    } = await getPhotos(searchQuery, page, perPage);
     console.log(results);
     if (!results.length) {
       iziToast.warning({
@@ -75,6 +110,8 @@ async function onSearchClick(evt) {
     }
 
     gallery.innerHTML = createMarkup(results);
+    hasMoreData(total_pages);
+    simplelightbox.refresh();
   } catch (err) {
     console.log(err);
   } finally {
@@ -83,6 +120,24 @@ async function onSearchClick(evt) {
   }
 }
 
+//безкінечний скрол
+async function loadMoreData() {
+  page += 1;
+  spinnerPlay();
+  try {
+    const {
+      data: { results, total_pages },
+    } = await getPhotos(searchQuery, page, perPage);
+
+    gallery.insertAdjacentHTML('beforeend', createMarkup(results));
+    hasMoreData(total_pages);
+    simplelightbox.refresh();
+  } catch (err) {
+    console.log(err);
+  } finally {
+    spinnerStop();
+  }
+}
 function createMarkup(arr) {
   return arr
     .map(
@@ -106,9 +161,15 @@ function spinnerStop() {
   spinner.stop();
   spinerContainer.classList.add('is-hidden');
 }
-
-// new SimpleLightbox('.gallery a', {
-//   captions: true,
-//   captionsData: 'alt',
-//   captionDelay: 250,
-// });
+function hasMoreData(lastPage) {
+  if (page < lastPage) {
+    //то слідкуємо далі за останнім елем
+    const lastArrItem = document.querySelector('.gallery-item:last-child');
+    observer.observe(lastArrItem);
+  } else {
+    iziToast.error({
+      title: 'Caution',
+      message: 'Sorry but it`s the last pictures in our server',
+    });
+  }
+}
