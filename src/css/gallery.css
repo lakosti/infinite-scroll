@@ -1,11 +1,16 @@
 .gallery-section {
   padding: 60px 0;
 }
-
+.title {
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.7em;
+}
 .search-form {
   display: flex;
   max-width: 600px;
   margin: 0 auto;
+  margin-top: 20px;
   margin-bottom: 40px;
 }
 
@@ -14,19 +19,20 @@
   flex-grow: 1;
   font-size: 18px;
   padding-left: 15px;
+  border-radius: 30px;
   border: 1px solid #303030;
 }
 
 .search-btn {
   font-size: 14px;
-  padding: 10px 20px;
+  padding: 10px 30px;
   background-color: #2ecc71;
   color: #ffffff;
   border: none;
   text-transform: uppercase;
   cursor: pointer;
   margin-left: 10px;
-  border-radius: 4px;
+  border-radius: 30px;
   transition: background-color 250ms linear;
 }
 
@@ -37,13 +43,15 @@
 
 .gallery {
   display: flex;
+  align-items: center;
+  justify-content: center;
   flex-wrap: wrap;
   gap: 15px;
   margin-bottom: 20px;
 }
 
-.gallery__item {
-  margin-left: 30px;
-  margin-top: 30px;
-  height: 300px;
+.gallery-img img {
+  height: 400px;
+  width: 300px;
+  border-radius: 30px;
 }
